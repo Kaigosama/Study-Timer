@@ -104,9 +104,33 @@ export default function Dashboard({ sessionSaved }) {
   const totalRestH  = (totals.rest  * MS_TO_HOURS).toFixed(1)
   const totalDays   = Object.keys(byDate).length
 
+  /** Export all raw sessions as a downloadable JSON file */
+  const handleExport = () => {
+    const blob = new Blob(
+      [JSON.stringify(sessions, null, 2)],
+      { type: 'application/json' }
+    )
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `study-sessions-${format(new Date(), 'yyyy-MM-dd')}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="w-full max-w-3xl mx-auto space-y-8">
-      <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+        {!isEmpty && (
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <span>⬇</span> Export JSON
+          </button>
+        )}
+      </div>
 
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
