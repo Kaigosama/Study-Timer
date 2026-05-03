@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Timer from './components/Timer'
+import Dashboard from './components/Dashboard'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('timer')
@@ -41,12 +42,7 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-6">
         {activeTab === 'timer' && <Timer />}
-        {activeTab === 'dashboard' && (
-          <div className="text-slate-500 text-center">
-            <p className="text-4xl mb-4">📊</p>
-            <p>Dashboard coming soon…</p>
-          </div>
-        )}
+        {activeTab === 'dashboard' && <Dashboard />}
       </main>
     </div>
   )
