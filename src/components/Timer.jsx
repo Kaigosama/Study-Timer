@@ -1,12 +1,19 @@
 import { useTimer } from '../hooks/useTimer'
+import { useStore } from '../hooks/useStore'
 import { formatTime } from '../utils/formatTime'
 
 export default function Timer({ onSessionSaved }) {
   const { status, displayStudyMs, displayRestMs, start, pause, resume, stop } = useTimer({ onSessionSaved })
+  const { getSessions } = useStore()
 
   const isIdle = status === 'idle'
   const isRunning = status === 'running'
   const isPaused = status === 'paused'
+
+  // Total sessions today (for idle state display)
+  const todayCount = isIdle
+    ? getSessions().filter((s) => s.date === new Date().toISOString().slice(0, 10)).length
+    : 0
 
   return (
     <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto">
@@ -50,7 +57,7 @@ export default function Timer({ onSessionSaved }) {
         {isIdle && (
           <button
             onClick={start}
-            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-lg"
+            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-lg shadow-lg shadow-emerald-900/30"
           >
             Start
           </button>
@@ -68,7 +75,7 @@ export default function Timer({ onSessionSaved }) {
               onClick={stop}
               className="px-6 py-3 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
             >
-              Stop
+              Stop & Save
             </button>
           </>
         )}
@@ -85,18 +92,25 @@ export default function Timer({ onSessionSaved }) {
               onClick={stop}
               className="px-6 py-3 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
             >
-              Stop
+              Stop & Save
             </button>
           </>
         )}
       </div>
 
-      {/* Hint */}
+      {/* Idle hints */}
       {isIdle && (
-        <p className="text-slate-600 text-sm text-center">
-          Press <span className="text-slate-400">Start</span> to begin a study session.<br />
-          Pausing counts as rest time.
-        </p>
+        <div className="text-center space-y-1">
+          <p className="text-slate-600 text-sm">
+            Press <span className="text-slate-400 font-medium">Start</span> to begin a session.{' '}
+            Pausing counts as rest time.
+          </p>
+          {todayCount > 0 && (
+            <p className="text-slate-600 text-xs">
+              {todayCount} session{todayCount !== 1 ? 's' : ''} completed today
+            </p>
+          )}
+        </div>
       )}
     </div>
   )
