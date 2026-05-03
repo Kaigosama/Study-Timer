@@ -24,13 +24,18 @@ export function useTimer({ onSessionSaved } = {}) {
   const restAccRef = useRef(0)     // accumulated rest ms
   const studyStartRef = useRef(null)  // Date.now() when we entered 'running'
   const pauseStartRef = useRef(null)  // Date.now() when we entered 'paused'
+  const statusRef = useRef('idle')    // mirror of status for use inside the tick closure
 
   // Kick off the display tick (updates every 100ms)
+  // Reads statusRef so the same interval works for both running and paused states.
   const startTick = useCallback(() => {
     clearInterval(intervalRef.current)
     intervalRef.current = setInterval(() => {
-      const liveStudy = studyAccRef.current + (Date.now() - studyStartRef.current)
-      setDisplayStudyMs(liveStudy)
+      if (statusRef.current === 'running' && studyStartRef.current) {
+        setDisplayStudyMs(studyAccRef.current + (Date.now() - studyStartRef.current))
+      } else if (statusRef.current === 'paused' && pauseStartRef.current) {
+        setDisplayRestMs(restAccRef.current + (Date.now() - pauseStartRef.current))
+      }
     }, 100)
   }, [])
 
@@ -48,21 +53,24 @@ export function useTimer({ onSessionSaved } = {}) {
     studyStartRef.current = Date.now()
     setDisplayStudyMs(0)
     setDisplayRestMs(0)
+    statusRef.current = 'running'
     setStatus('running')
     startTick()
   }, [status, startTick])
 
   const pause = useCallback(() => {
     if (status !== 'running') return
-    stopTick()
     // Flush current study segment into accumulator
     studyAccRef.current += Date.now() - studyStartRef.current
     studyStartRef.current = null
     // Record when rest started
     pauseStartRef.current = Date.now()
     setDisplayStudyMs(studyAccRef.current)
+    statusRef.current = 'paused'
     setStatus('paused')
-  }, [status, stopTick])
+    // Keep the tick running so the rest display counts up live
+    startTick()
+  }, [status, startTick])
 
   const resume = useCallback(() => {
     if (status !== 'paused') return
@@ -72,6 +80,7 @@ export function useTimer({ onSessionSaved } = {}) {
     setDisplayRestMs(restAccRef.current)
     // Start new study segment
     studyStartRef.current = Date.now()
+    statusRef.current = 'running'
     setStatus('running')
     startTick()
   }, [status, startTick])
@@ -114,6 +123,7 @@ export function useTimer({ onSessionSaved } = {}) {
     restAccRef.current = 0
     studyStartRef.current = null
     pauseStartRef.current = null
+    statusRef.current = 'idle'
     setDisplayStudyMs(0)
     setDisplayRestMs(0)
     setStatus('idle')
