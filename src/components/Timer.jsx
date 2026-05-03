@@ -3,7 +3,7 @@ import { useStore } from '../hooks/useStore'
 import { formatTime } from '../utils/formatTime'
 
 export default function Timer({ onSessionSaved }) {
-  const { status, displayStudyMs, displayRestMs, start, pause, resume, stop } = useTimer({ onSessionSaved })
+  const { status, displayStudyMs, displayRestMs, start, pause, resume, stop, discard } = useTimer({ onSessionSaved })
   const { getSessions } = useStore()
 
   const isIdle = status === 'idle'
@@ -97,6 +97,16 @@ export default function Timer({ onSessionSaved }) {
           </>
         )}
       </div>
+
+      {/* Discard — shown whenever a session is in progress */}
+      {!isIdle && (
+        <button
+          onClick={discard}
+          className="text-xs text-slate-600 hover:text-rose-400 transition-colors underline underline-offset-2"
+        >
+          Discard session
+        </button>
+      )}
 
       {/* Idle hints */}
       {isIdle && (

@@ -129,6 +129,20 @@ export function useTimer({ onSessionSaved } = {}) {
     setStatus('idle')
   }, [status, stopTick, saveSession, getStreak, saveStreak])
 
+  /** Abandon the current session without saving anything. */
+  const discard = useCallback(() => {
+    if (status === 'idle') return
+    stopTick()
+    studyAccRef.current = 0
+    restAccRef.current = 0
+    studyStartRef.current = null
+    pauseStartRef.current = null
+    statusRef.current = 'idle'
+    setDisplayStudyMs(0)
+    setDisplayRestMs(0)
+    setStatus('idle')
+  }, [status, stopTick])
+
   return {
     status,
     displayStudyMs,
@@ -137,5 +151,6 @@ export function useTimer({ onSessionSaved } = {}) {
     pause,
     resume,
     stop,
+    discard,
   }
 }

@@ -41,5 +41,13 @@ export function useStore() {
     localStorage.setItem(STREAK_KEY, JSON.stringify(streak))
   }
 
-  return { saveSession, getSessions, getStreak, saveStreak }
+  /**
+   * Wipe all sessions and streak data from localStorage.
+   */
+  const clearAllData = () => {
+    localStorage.removeItem(SESSIONS_KEY)
+    localStorage.removeItem(STREAK_KEY)
+  }
+
+  return { saveSession, getSessions, getStreak, saveStreak, clearAllData }
 }
