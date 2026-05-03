@@ -1,8 +1,8 @@
 import { useTimer } from '../hooks/useTimer'
 import { formatTime } from '../utils/formatTime'
 
-export default function Timer() {
-  const { status, displayStudyMs, displayRestMs, start, pause, resume, stop } = useTimer()
+export default function Timer({ onSessionSaved }) {
+  const { status, displayStudyMs, displayRestMs, start, pause, resume, stop } = useTimer({ onSessionSaved })
 
   const isIdle = status === 'idle'
   const isRunning = status === 'running'

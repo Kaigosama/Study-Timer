@@ -10,7 +10,7 @@ import { computeStreak, todayStr } from '../utils/dateHelpers'
  *
  * Time is tracked using Date.now() wall-clock stamps — never setInterval counting.
  */
-export function useTimer() {
+export function useTimer({ onSessionSaved } = {}) {
   const { saveSession, getStreak, saveStreak } = useStore()
 
   // --- State ---
@@ -105,6 +105,9 @@ export function useTimer() {
       const updatedStreak = computeStreak(currentStreak)
       saveStreak(updatedStreak)
     }
+
+    // Notify parent that a session was saved
+    if (onSessionSaved) onSessionSaved()
 
     // Reset everything
     studyAccRef.current = 0

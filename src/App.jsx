@@ -1,9 +1,16 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Timer from './components/Timer'
 import Dashboard from './components/Dashboard'
+import Streak from './components/Streak'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('timer')
+  // Increments every time a session is saved — used to trigger Streak refresh
+  const [sessionSaved, setSessionSaved] = useState(0)
+
+  const handleSessionSaved = useCallback(() => {
+    setSessionSaved((n) => n + 1)
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100">
@@ -40,9 +47,14 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-6">
-        {activeTab === 'timer' && <Timer />}
-        {activeTab === 'dashboard' && <Dashboard />}
+      <main className="flex-1 flex items-start justify-center p-6 pt-10">
+        {activeTab === 'timer' && (
+          <div className="flex flex-col items-center w-full">
+            <Timer onSessionSaved={handleSessionSaved} />
+            <Streak onSessionSaved={sessionSaved} />
+          </div>
+        )}
+        {activeTab === 'dashboard' && <Dashboard sessionSaved={sessionSaved} />}
       </main>
     </div>
   )

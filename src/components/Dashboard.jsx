@@ -50,14 +50,14 @@ function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name })
   )
 }
 
-export default function Dashboard() {
+export default function Dashboard({ sessionSaved }) {
   const { getSessions } = useStore()
   const [sessions, setSessions] = useState([])
 
-  // Load sessions on mount
+  // Reload sessions on mount and whenever a new session is saved
   useEffect(() => {
     setSessions(getSessions())
-  }, [])
+  }, [sessionSaved])
 
   // Aggregate sessions by date
   const byDate = useMemo(() => {
